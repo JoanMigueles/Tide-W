@@ -3,54 +3,63 @@ using UnityEngine.EventSystems;
 
 public class CardDeployer : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    public GameObject boatPrefab;
+    public GameObject unitPrefab; // Reference to the 3D asset prefab
 
-    private GameObject cardBeingDragged;
+    private RectTransform cardRectTransform;
+    private CanvasGroup canvasGroup;
+
+    private Vector3 initialPosition;
+    private Vector2 offset;
 
     private void Start()
     {
+        cardRectTransform = GetComponent<RectTransform>();
+        canvasGroup = GetComponent<CanvasGroup>();
+        initialPosition = cardRectTransform.position;
+        Debug.Log(initialPosition);
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        GameManager.instance.setDragging(true);
-        // Instantiate the card being dragged
-        cardBeingDragged = Instantiate(gameObject, gameObject.transform);
-        cardBeingDragged.transform.SetAsLastSibling();
+        if (canvasGroup != null)
+        {
+            canvasGroup.blocksRaycasts = false;
+        }
+
+        // Calculate offset from pointer position to the center of the card
+        offset = new Vector2(cardRectTransform.position.x, cardRectTransform.position.y) - eventData.position;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        // Update the position of the card being dragged
-        cardBeingDragged.transform.position = eventData.position;
+        // Update card position relative to pointer position
+        cardRectTransform.position = eventData.position + offset;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        if (canvasGroup != null)
+        {
+            canvasGroup.blocksRaycasts = true;
+        }
 
-        // Check if the card was dropped onto the hexboard
         RaycastHit hit;
-        if (Physics.Raycast(eventData.pointerCurrentRaycast.worldPosition, Vector3.down, out hit))
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        if (Physics.Raycast(ray, out hit))
         {
             Hexagon hexagon = hit.collider.GetComponent<Hexagon>();
             if (hexagon != null)
             {
-                // Instantiate the prefab in the hexagon's position
-                InstantiatePrefabInHex(hexagon);
+                // Instantiate the unit prefab onto the hexagon
+                Instantiate(unitPrefab, hexagon.transform.position, Quaternion.identity);
+                // If successful, make the card disappear
+                gameObject.SetActive(false);
+                return;
             }
         }
 
-        // Destroy the dragged card object
-        Destroy(cardBeingDragged);
-        GameManager.instance.setDragging(false);
-    }
-
-    private void InstantiatePrefabInHex(Hexagon hexagon)
-    {
-        // Instantiate your prefab in the hexagon's position
-        // For example:
-        GameObject boat = Instantiate(boatPrefab, hexagon.transform.position, Quaternion.identity);
-        boat.GetComponent<BoatMovement>().hexagon = hexagon;
-
+        // If deployment fails, return the card to its initial position before the drag
+        cardRectTransform.position = initialPosition;
     }
 }

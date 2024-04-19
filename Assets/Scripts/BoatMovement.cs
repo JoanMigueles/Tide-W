@@ -3,17 +3,11 @@ using UnityEngine;
 
 public class BoatMovement : MonoBehaviour
 {
-    // Speed of boat movement
     public float moveSpeed = 5f;
-
-    // Reference to the hexagon manager
     public Hexagon hexagon;
-
-    // Flag to check if boat is moving
     private bool isMoving = false;
     
 
-    // Start is called before the first frame update
     void Start()
     {
     }
@@ -25,8 +19,8 @@ public class BoatMovement : MonoBehaviour
             if (Input.GetMouseButtonUp(0) && !isMoving)
             {
                 // Cast a ray from the mouse position
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
                 // If the ray hits a collider
                 if (Physics.Raycast(ray, out hit))
@@ -35,11 +29,9 @@ public class BoatMovement : MonoBehaviour
                     if (hit.collider.CompareTag("Hex"))
                     {
                         GameObject targetHexagon = hit.collider.gameObject;
-
                         // Check if the target hexagon is a neighbor
                         if (hexagon.IsNeighbor(targetHexagon))
                         {
-                            Debug.Log("going");
                             // Move the boat to the center of the target hexagon
                             StartCoroutine(MoveToTarget(targetHexagon.transform.position));
                             hexagon = targetHexagon.GetComponent<Hexagon>();
@@ -62,7 +54,6 @@ public class BoatMovement : MonoBehaviour
     // Move boat to the target position
     IEnumerator MoveToTarget(Vector3 targetPosition)
     {
-
         isMoving = true;
 
         // Keep moving towards the target position until reached
