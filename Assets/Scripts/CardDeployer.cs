@@ -52,7 +52,11 @@ public class CardDeployer : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
             if (hexagon != null)
             {
                 // Instantiate the unit prefab onto the hexagon
-                Instantiate(unitPrefab, hexagon.transform.position, Quaternion.identity);
+                GameObject unit = Instantiate(unitPrefab, hexagon.transform.position, Quaternion.identity);
+                BoatMovement boatMovement = unit.GetComponent<BoatMovement>();
+                if (boatMovement != null ) {
+                    boatMovement.hexagon = hexagon;
+                }
                 // If successful, make the card disappear
                 gameObject.SetActive(false);
                 return;
