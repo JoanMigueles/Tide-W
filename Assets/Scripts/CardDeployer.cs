@@ -3,67 +3,72 @@ using UnityEngine.EventSystems;
 
 public class CardDeployer : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    public GameObject unitPrefab; // Reference to the 3D asset prefab
+    public Entity troopPrefab; // Reference to the 3D asset prefab
 
-    private RectTransform cardRectTransform;
-    private CanvasGroup canvasGroup;
-
-    private Vector3 initialPosition;
     private Vector2 offset;
+    private Vector2 initialPosition;
+
+    private Transform canvas;
+    private Transform cardSlot;
 
     private void Start()
     {
-        cardRectTransform = GetComponent<RectTransform>();
-        canvasGroup = GetComponent<CanvasGroup>();
-        initialPosition = cardRectTransform.position;
-        Debug.Log(initialPosition);
+        canvas = transform.parent.parent.parent;
+        cardSlot = transform.parent;
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (canvasGroup != null)
-        {
-            canvasGroup.blocksRaycasts = false;
-        }
-
         // Calculate offset from pointer position to the center of the card
-        offset = new Vector2(cardRectTransform.position.x, cardRectTransform.position.y) - eventData.position;
+        offset = new Vector2(transform.position.x, transform.position.y) - eventData.position;
+        initialPosition = transform.position;
+        transform.SetParent(canvas);
+        GameManager.instance.SetDragging(true);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
         // Update card position relative to pointer position
-        cardRectTransform.position = eventData.position + offset;
+        transform.position = eventData.position + offset;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (canvasGroup != null)
-        {
-            canvasGroup.blocksRaycasts = true;
-        }
-
+        GameManager.instance.SetDragging(false);
+        // Look for the hexagon to instantiate the boat
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-        if (Physics.Raycast(ray, out hit))
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("UI")))
         {
             Hexagon hexagon = hit.collider.GetComponent<Hexagon>();
-            if (hexagon != null)
+            float currentOrbs = GameManager.instance.GetOrbs();
+
+            if (hexagon != null && currentOrbs >= troopPrefab.orbCost && hexagon.IsFree())
             {
                 // Instantiate the unit prefab onto the hexagon
-                GameObject unit = Instantiate(unitPrefab, hexagon.transform.position, Quaternion.identity);
-                BoatMovement boatMovement = unit.GetComponent<BoatMovement>();
-                if (boatMovement != null ) {
-                    boatMovement.hexagon = hexagon;
+                GameManager.instance.SetOrbs(currentOrbs - troopPrefab.orbCost);
+
+                Entity entity = Instantiate(troopPrefab, hexagon.transform.position, Quaternion.identity);
+
+                // Check if the instantiated entity is a Structure
+                if (entity is Structure structure)
+                {
+                    // Set the hexagon property for the structure
+                    structure.hexagon = hexagon;
+                    //hexagon.SetAvailability(false);
                 }
+
                 // If successful, make the card disappear
-                gameObject.SetActive(false);
+                Destroy(gameObject);
+
+                GameManager.instance.RestockCard(troopPrefab.type);
                 return;
             }
         }
 
         // If deployment fails, return the card to its initial position before the drag
-        cardRectTransform.position = initialPosition;
+        transform.position = initialPosition;
+        transform.SetParent(cardSlot);
     }
 }

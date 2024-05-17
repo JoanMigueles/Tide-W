@@ -8,12 +8,41 @@ public class Hexagon : MonoBehaviour
 
     private Image image;
     private Color originalColor;
+    [SerializeField] private bool available = true;
     public Color fullOpacityColor;
 
     void Start()
     {
         image = GetComponentInChildren<Image>();
         originalColor = image.color;
+    }
+
+    private void Update()
+    {
+        // Check if the mouse is over the hexagon
+        if (IsMouseOverHexagon())
+        {
+            OnMouseEnter();
+        }
+        else
+        {
+            OnMouseExit();
+        }
+    }
+
+    private bool IsMouseOverHexagon()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        // Perform the raycast and check if it hits a collider in the Hexagon layer
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("UI")))
+        {
+            Hexagon hexagon = hit.collider.GetComponent<Hexagon>();
+            if (hexagon == this) return true;
+        }
+
+        return false;
     }
 
     private void OnMouseEnter()
@@ -41,5 +70,15 @@ public class Hexagon : MonoBehaviour
         }
 
         return false;
+    }
+
+    public void SetAvailability(bool available)
+    {
+        this.available = available;
+    }
+
+    public bool IsFree()
+    {
+        return available;
     }
 }
