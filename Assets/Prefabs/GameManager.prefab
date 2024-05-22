@@ -44,3 +44,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73eceef75407fae48b0b6eb299c8b542, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  slots:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  cards:
+  - {fileID: 3705662745982780942, guid: e028d521eb22d1f418a6645a0c8ddc84, type: 3}
+  - {fileID: 3705662745982780942, guid: 3d5198c98d040e44ba9906221768e3a5, type: 3}
+  - {fileID: 3705662745982780942, guid: c0a9f06b0c21bc54e99a840e3f400203, type: 3}
+  - {fileID: 3705662745982780942, guid: d8f42ce48d792d445816e4403210c7de, type: 3}

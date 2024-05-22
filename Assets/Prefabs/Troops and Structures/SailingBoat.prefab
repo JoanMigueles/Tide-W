@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7884883000500546152}
   - component: {fileID: 826466652736708676}
   - component: {fileID: 7575229485256943337}
+  - component: {fileID: 8239169052056491359}
   m_Layer: 6
   m_Name: SailingBoat
   m_TagString: Untagged
@@ -83,6 +84,22 @@ CapsuleCollider:
   m_Height: 9.96
   m_Direction: 2
   m_Center: {x: 0, y: 1.37, z: -0.43}
+--- !u!208 &8239169052056491359
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1663802136288175396}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 1.065, y: 2.17, z: 3.21}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0.79, z: -1.01}
+  m_TimeToStationary: 0.5
 --- !u!1 &2190514249793505106
 GameObject:
   m_ObjectHideFlags: 0

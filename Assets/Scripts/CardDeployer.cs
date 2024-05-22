@@ -34,17 +34,16 @@ public class CardDeployer : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        GameManager.instance.SetDragging(false);
         // Look for the hexagon to instantiate the boat
         RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("UI")))
         {
-            Hexagon hexagon = hit.collider.GetComponent<Hexagon>();
+            Hexagon hexagon = hit.collider.GetComponentInParent<Hexagon>();
             float currentOrbs = GameManager.instance.GetOrbs();
 
-            if (hexagon != null && currentOrbs >= troopPrefab.orbCost && hexagon.IsFree())
+            if (hexagon != null && currentOrbs >= troopPrefab.orbCost && hexagon.IsFree() && hexagon.side == Side.Ally)
             {
                 // Instantiate the unit prefab onto the hexagon
                 GameManager.instance.SetOrbs(currentOrbs - troopPrefab.orbCost);
@@ -56,13 +55,14 @@ public class CardDeployer : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
                 {
                     // Set the hexagon property for the structure
                     structure.hexagon = hexagon;
-                    //hexagon.SetAvailability(false);
+                    hexagon.SetAvailability(false);
                 }
 
                 // If successful, make the card disappear
                 Destroy(gameObject);
 
                 GameManager.instance.RestockCard(troopPrefab.type);
+                GameManager.instance.SetDragging(false);
                 return;
             }
         }
@@ -70,5 +70,7 @@ public class CardDeployer : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         // If deployment fails, return the card to its initial position before the drag
         transform.position = initialPosition;
         transform.SetParent(cardSlot);
+
+        GameManager.instance.SetDragging(false);
     }
 }
