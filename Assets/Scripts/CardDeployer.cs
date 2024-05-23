@@ -1,9 +1,14 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class CardDeployer : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public Entity troopPrefab; // Reference to the 3D asset prefab
+    private AudioSource audioSource;
+    [SerializeField] private AudioClip grabClip;
+    [SerializeField] private AudioClip dropClip;
+    [SerializeField] private AudioClip notAllowedClip;
 
     private Vector2 offset;
     private Vector2 initialPosition;
@@ -15,10 +20,12 @@ public class CardDeployer : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
     {
         canvas = transform.parent.parent.parent;
         cardSlot = transform.parent;
+        audioSource = GameManager.instance.GetComponent<AudioSource>();
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        audioSource.PlayOneShot(grabClip);
         // Calculate offset from pointer position to the center of the card
         offset = new Vector2(transform.position.x, transform.position.y) - eventData.position;
         initialPosition = transform.position;
@@ -28,6 +35,15 @@ public class CardDeployer : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
     public void OnDrag(PointerEventData eventData)
     {
+
+        Image image = GetComponent<Image>();
+        if (eventData.position.y > 100f)
+        {
+            image.color = new Color(1f, 1f, 1f, 0.2f);
+        } else
+        {
+            image.color = new Color(1f, 1f, 1f, 1f);
+        }
         // Update card position relative to pointer position
         transform.position = eventData.position + offset;
     }
@@ -45,6 +61,7 @@ public class CardDeployer : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
             if (hexagon != null && currentOrbs >= troopPrefab.orbCost && hexagon.IsFree() && hexagon.side == Side.Ally)
             {
+                audioSource.PlayOneShot(dropClip);
                 // Instantiate the unit prefab onto the hexagon
                 GameManager.instance.SetOrbs(currentOrbs - troopPrefab.orbCost);
 
@@ -68,8 +85,11 @@ public class CardDeployer : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         }
 
         // If deployment fails, return the card to its initial position before the drag
+        audioSource.PlayOneShot(notAllowedClip);
         transform.position = initialPosition;
         transform.SetParent(cardSlot);
+        Image image = GetComponent<Image>();
+        image.color = new Color(1f, 1f, 1f, 1f);
 
         GameManager.instance.SetDragging(false);
     }

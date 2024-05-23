@@ -89,3 +89,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   troopPrefab: {fileID: 6713749435935619836, guid: 3c0ff60788bcd664985ea02805cbde82, type: 3}
+  grabClip: {fileID: 8300000, guid: 0994c12e202f342459a4212e7287f7e8, type: 3}
+  dropClip: {fileID: 8300000, guid: ffb159a21c8a04135a5616979c828fab, type: 3}
+  notAllowedClip: {fileID: 8300000, guid: 89e6bc608da7b47d4914f3d9c2484e48, type: 3}
