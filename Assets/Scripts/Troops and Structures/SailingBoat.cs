@@ -21,33 +21,39 @@ public class SailingBoat : Structure
 
         if (team == Team.Ally)
         {
-            if (Input.GetMouseButtonUp(0) && !isMoving && !GameManager.instance.IsDragging())
+            if (Input.GetMouseButtonUp(0)) 
             {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-                // If the ray hits a collider
-                if (Physics.Raycast(ray, out RaycastHit hit))
+                if (!isMoving && !GameManager.instance.IsDragging())
                 {
-                    // Check if the collider is a hexagon
-                    if (hit.collider.CompareTag("Hex"))
+                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+                    // If the ray hits a collider
+                    if (Physics.Raycast(ray, out RaycastHit hit))
                     {
-                        Hexagon targetHexagon = hit.collider.GetComponentInParent<Hexagon>();
-                        // Check if the target hexagon is a neighbor
-                        if (targetHexagon != null && hexagon.IsNeighbor(targetHexagon.gameObject) && targetHexagon.IsFree())
+                        // Check if the collider is a hexagon
+                        if (hit.collider.CompareTag("Hex"))
                         {
-                            hexagon.SetAvailability(true);
-                            targetHexagon.SetAvailability(false);
-                            // Move the boat to the center of the target hexagon
-                            hexagon = targetHexagon;
-                            StartCoroutine(MoveToHexagon(hexagon));
+                            Hexagon targetHexagon = hit.collider.GetComponentInParent<Hexagon>();
+                            // Check if the target hexagon is a neighbor
+                            if (targetHexagon != null && hexagon.IsNeighbor(targetHexagon.gameObject) && targetHexagon.IsFree())
+                            {
+                                hexagon.SetAvailability(true);
+                                targetHexagon.SetAvailability(false);
+                                // Move the boat to the center of the target hexagon
+                                hexagon = targetHexagon;
+                                StartCoroutine(MoveToHexagon(hexagon));
 
-                            // Calculate direction vector to the target hexagon
-                            Vector3 direction = (targetHexagon.transform.position - transform.position).normalized;
+                                // Calculate direction vector to the target hexagon
+                                Vector3 direction = (targetHexagon.transform.position - transform.position).normalized;
 
-                            // Rotate the boat to face the direction it's moving
-                            transform.rotation = Quaternion.LookRotation(direction);
+                                // Rotate the boat to face the direction it's moving
+                                transform.rotation = Quaternion.LookRotation(direction);
+                            }
                         }
                     }
+                } else
+                {
+                    GameManager.instance.SetDragging(false);
                 }
             }
         } else

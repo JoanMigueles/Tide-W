@@ -79,7 +79,6 @@ public class CardDeployer : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
                 Destroy(gameObject);
 
                 GameManager.instance.RestockCard(troopPrefab.type);
-                GameManager.instance.SetDragging(false);
                 return;
             }
         }
@@ -90,7 +89,5 @@ public class CardDeployer : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         transform.SetParent(cardSlot);
         Image image = GetComponent<Image>();
         image.color = new Color(1f, 1f, 1f, 1f);
-
-        GameManager.instance.SetDragging(false);
     }
 }
